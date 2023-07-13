@@ -19,6 +19,8 @@ const dbConfig = {
 async function insertData(name, address, n_id) {
   let connection;
 
+  let retvalue = false;
+
   try {
     // Create a connection pool
     connection = await oracledb.getConnection(dbConfig);
@@ -30,32 +32,42 @@ async function insertData(name, address, n_id) {
     const result = await connection.execute(sql, bindParams, options);
 
     console.log(result);
+    retvalue = true;
+
   } catch (error) {
     console.error(error);
+    retvalue = false;
   } finally {
     // Release the connection
     if (connection) {
       try {
         await connection.close();
+        return retvalue;
       } catch (error) {
         console.error(error);
+        return retvalue;
       }
     }
   }
 }
 
 // Handle form submission
-app.post('/submit', (req, res) => {
+app.post('/submit', async (req, res) => {
   // Retrieve form data
   const name = req.body.name;
   const address = req.body.address;
   const n_id = req.body.n_id;
 
   // Insert data into Oracle database
-  insertData(name, address, n_id);
+  let insertionSuccess = await insertData(name, address, n_id);
+  if (insertionSuccess) {
+    res.send('Data submitted successfully!');
+  } else {
+    res.send('Registraion failed!');
+  }
 
   // Send a response to the client
-  res.send('Data submitted successfully!');
+  
 });
 
 // Start the server
