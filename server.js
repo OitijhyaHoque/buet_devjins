@@ -10,9 +10,9 @@ app.use(express.static(__dirname));
 
 // Oracle database connection details
 const dbConfig = {
-  user: 'UNIVERISTY',
+  user: 'VACCINATION',
   password: '69420',
-  connectString: 'CONNECT_STRING',
+  connectString: 'localhost:1521/orclpdb',
 };
 
 // Perform the database insertion
@@ -24,7 +24,7 @@ async function insertData(name, address, n_id) {
     connection = await oracledb.getConnection(dbConfig);
 
     // Insert data into a table
-    const sql = 'INSERT INTO your_table (name, address, n_id) VALUES (:name, :address, :n_id)';
+    const sql = 'INSERT INTO UserTable (name, address, n_id) VALUES (:name, :address, :n_id)';
     const bindParams = { name, address, n_id };
     const options = { autoCommit: true };
     const result = await connection.execute(sql, bindParams, options);
