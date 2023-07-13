@@ -56,6 +56,7 @@ app.post('/submit', (req, res) => {
 
   // Send a response to the client
   res.send('Data submitted successfully!');
+  res.status(200);
 });
 
 // Start the server
