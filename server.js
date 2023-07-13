@@ -55,8 +55,10 @@ app.post('/submit', (req, res) => {
   insertData(name, address, n_id);
 
   // Send a response to the client
-  res.send('Data submitted successfully!');
-  res.status(200);
+  res.statusCode=200;
+  res.send({"name": req.body.name, 
+    "address": req.body.address, 
+    "n_id": req.body.n_id, 
 });
 
 // Start the server
