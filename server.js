@@ -1,61 +1,64 @@
 const express = require('express');
-const oracledb = require('oracledb');
+const bodyParser = require('body-parser');
 const app = express();
-const port = 3000;
 
-// Configure Oracle database connection
+app.use(bodyParser.urlencoded({ extended: true }));
+
+const oracledb = require('oracledb');
+
+app.use(express.static(__dirname));
+
+// Oracle database connection details
 const dbConfig = {
-  user: 'your_username',
-  password: 'your_password',
-  connectString: 'your_connect_string',
+  user: 'VACCINATION',
+  password: '69420',
+  connectString: 'localhost:1521/orclpdb',
 };
 
-// Create a pool of connections
-oracledb.createPool(dbConfig)
-  .then(() => {
-    console.log('Connected to Oracle database');
-  })
-  .catch((error) => {
-    console.error('Error connecting to Oracle database:', error);
-  });
+// Perform the database insertion
+async function insertData(name, address, n_id) {
+  let connection;
 
-// Middleware to parse the request body
-app.use(express.urlencoded({ extended: false }));
+  try {
+    // Create a connection pool
+    connection = await oracledb.getConnection(dbConfig);
 
-// Route for form submission
+    // Insert data into a table
+    const sql = 'INSERT INTO UserTable (name, address, n_id) VALUES (:name, :address, :n_id)';
+    const bindParams = { name, address, n_id };
+    const options = { autoCommit: true };
+    const result = await connection.execute(sql, bindParams, options);
+
+    console.log(result);
+  } catch (error) {
+    console.error(error);
+  } finally {
+    // Release the connection
+    if (connection) {
+      try {
+        await connection.close();
+      } catch (error) {
+        console.error(error);
+      }
+    }
+  }
+}
+
+// Handle form submission
 app.post('/submit', (req, res) => {
-  const { name, email, message } = req.body;
+  // Retrieve form data
+  const name = req.body.name;
+  const address = req.body.address;
+  const n_id = req.body.n_id;
 
-  // Perform any necessary validation or sanitization
+  // Insert data into Oracle database
+  insertData(name, address, n_id);
 
-  const insertQuery = 'INSERT INTO UserTable (name, address, n_id) VALUES (:name, :email, :message)';
-  const insertParams = {
-    name: name,
-    email: email,
-    message: message
-  };
-
-  oracledb.getConnection()
-    .then((connection) => {
-      connection.execute(insertQuery, insertParams)
-        .then(() => {
-          console.log('Data saved to the Oracle database');
-          res.status(200).send('Data saved to the database.');
-          connection.close();
-        })
-        .catch((error) => {
-          console.error('Error saving data to Oracle database:', error);
-          res.status(500).send('An error occurred while saving the data.');
-          connection.close();
-        });
-    })
-    .catch((error) => {
-      console.error('Error getting Oracle database connection:', error);
-      res.status(500).send('An error occurred while saving the data.');
-    });
+  // Send a response to the client
+  res.send('Data submitted successfully!');
 });
 
 // Start the server
-app.listen(port, () => {
-  console.log(`Server running on port ${port}`);
+app.listen(3000, () => {
+  console.log('Server is running on port 3000');
 });
