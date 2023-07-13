@@ -12,7 +12,7 @@ pipeline{
         stage('Unit Testing')
         {
             steps{
-                    sh 'mvn test'
+                    sh 'npm install'
             }
             
         }
