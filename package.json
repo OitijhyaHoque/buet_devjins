@@ -4,7 +4,7 @@
   "description": "hackathon project",
   "main": "server.js",
   "scripts": {
-    "test": "npx jest --detectOpeneHandles",
+    "test": "npx jest --detectOpenHandles",
     "start": "node server.js"
   },
   "author": "",
