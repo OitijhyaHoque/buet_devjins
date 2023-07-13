@@ -43,3 +43,6 @@ describe('Vaccination Registration Form', () => {
       }); 
   }); 
 });
+afterAll((done) => {
+    server.close(done);
+});
